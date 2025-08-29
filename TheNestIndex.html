@@ -1,111 +1,143 @@
-<!DOCTYPE html><html lang="en" class="h-full"><head><meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https://cdnjs.cloudflare.com https://cdn.jsdelivr.net https://code.jquery.com https://unpkg.com https://d3js.org https://threejs.org https://cdn.plot.ly https://stackpath.bootstrapcdn.com https://maps.googleapis.com https://cdn.tailwindcss.com https://ajax.googleapis.com https://kit.fontawesome.com https://cdn.datatables.net https://maxcdn.bootstrapcdn.com https://code.highcharts.com https://tako-static-assets-production.s3.amazonaws.com https://www.youtube.com https://fonts.googleapis.com https://fonts.gstatic.com https://pfst.cf2.poecdn.net https://puc.poecdn.net https://i.imgur.com https://wikimedia.org https://*.icons8.com https://*.giphy.com https://picsum.photos https://images.unsplash.com; frame-src 'self' https://www.youtube.com https://trytako.com; child-src 'self'; manifest-src 'self'; worker-src 'self'; upgrade-insecure-requests; block-all-mixed-content;">
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Nest - Ministry Agenda Planner</title>
+    <title>Worship Lyrics Slideshow</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
                         primary: '#5D5CDE',
-                        'primary-dark': '#4C4BC9',
-                        'ministry': '#8B5A3C',
-                        'ministry-light': '#D2B48C'
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        }
                     }
                 }
             }
         }
     </script>
     <style>
-        .drag-over {
-            background-color: rgba(93, 92, 222, 0.1);
-            border-color: #5D5CDE;
+        .blur-text {
+            filter: blur(1px);
+            opacity: 0.8;
         }
-        .tab-active {
-            background-color: #5D5CDE;
+        
+        .dark .app-container {
+            background-color: #181818;
             color: white;
         }
-        .timeline-line {
-            background: linear-gradient(to bottom, #5D5CDE 0%, #8B5A3C 100%);
+        
+        .dark .input-container {
+            background-color: #222;
+        }
+        
+        .dark .slideshow-container {
+            background-color: #111;
+        }
+        
+        .transition-all {
+            transition: all 0.3s ease;
+        }
+        
+        /* Simple, clean transitions */
+        .lyrics-line {
+            transition: opacity 0.3s ease;
         }
     </style>
 </head>
-<body class="h-full bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
-    <div class="min-h-full flex flex-col">
-        <!-- Header -->
-        <header class="bg-gradient-to-r from-ministry to-primary text-white shadow-lg">
-            <div class="max-w-7xl mx-auto px-4 py-6">
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-dove text-2xl"></i>
-                        <h1 class="text-2xl md:text-3xl font-bold">The Nest - Ministry Agenda</h1>
-                    </div>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <input type="text" id="organizerName" placeholder="Organizer Name" class="px-3 py-2 text-base text-gray-900 rounded-lg border border-gray-300 focus:ring-2 focus:ring-primary-dark focus:border-transparent">
-                        <div class="flex gap-2">
-                            <button onclick="saveAgenda()" class="px-4 py-2 bg-green-500 hover:bg-green-600 rounded-lg font-medium transition-colors">
-                                <i class="fas fa-save mr-2"></i>Save
-                            </button>
-                            <button onclick="loadAgenda()" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg font-medium transition-colors">
-                                <i class="fas fa-upload mr-2"></i>Load
-                            </button>
-                        </div>
-                    </div>
+<body class="h-full m-0 font-sans bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+    <div class="app-container h-full flex flex-col">
+        <!-- Input view -->
+        <div id="inputView" class="flex flex-col h-full p-4">
+            <h1 class="text-2xl font-bold text-center mb-4 text-primary dark:text-primary">Worship Lyrics Slideshow</h1>
+            
+            <div class="input-container bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex-grow flex flex-col">
+                <label for="lyricsInput" class="block text-sm font-medium mb-2">Paste your lyrics below:</label>
+                <textarea 
+                    id="lyricsInput" 
+                    class="w-full flex-grow p-3 border rounded-md text-base dark:bg-gray-700 dark:border-gray-600 focus:border-primary focus:ring-primary"
+                    placeholder="Enter your lyrics here. Each line will be treated as a separate slide."></textarea>
+                
+                <div class="flex flex-wrap justify-center gap-4 mt-4">
+                    <button 
+                        id="startButton" 
+                        class="bg-primary hover:bg-primary/90 text-white py-2 px-6 rounded-md text-base transition-all"
+                        >Start Slideshow</button>
+                    <button 
+                        id="saveButton" 
+                        class="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-md text-base transition-all"
+                        >Save to File</button>
+                    <button 
+                        id="loadButton" 
+                        class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md text-base transition-all"
+                        >Load from File</button>
+                    <button 
+                        id="clearButton" 
+                        class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 py-2 px-6 rounded-md text-base transition-all"
+                        >Clear Lyrics</button>
+                    <input type="file" id="fileInput" accept=".txt" class="hidden" />
                 </div>
             </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="flex-1 max-w-7xl mx-auto w-full px-4 py-6">
-            <!-- Main Tabs (Staff/Participants) -->
-            <div class="mb-6">
-                <div class="flex gap-2 mb-6">
-                    <button id="staffTab" onclick="switchMainTab('staff')" class="px-6 py-3 rounded-lg font-semibold transition-colors bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
-                        <i class="fas fa-users-cog mr-2"></i>Staff Agenda
-                    </button>
-                    <button id="participantsTab" onclick="switchMainTab('participants')" class="px-6 py-3 rounded-lg font-semibold transition-colors tab-active">
-                        <i class="fas fa-users mr-2"></i>Participants Agenda
-                    </button>
+        </div>
+        
+        <!-- Slideshow view -->
+        <div id="slideshowView" class="h-full flex flex-col hidden">
+            <div class="slideshow-container bg-black text-white flex-grow flex flex-col justify-center items-center relative" id="slideshowContainer">
+                <div class="absolute top-4 left-4 flex space-x-2">
+                    <button 
+                        id="exitButton" 
+                        class="bg-gray-800 hover:bg-gray-700 text-white py-1 px-3 rounded-md text-sm"
+                        >Exit</button>
+                    <button 
+                        id="prevButton" 
+                        class="bg-gray-800 hover:bg-gray-700 text-white py-1 px-3 rounded-md text-sm"
+                        title="Go to previous slide"
+                        >&larr; Back</button>
                 </div>
-
-                <!-- Tab Content -->
-                <div id="mainTabContent">
-                    <!-- Staff Content -->
-                    <div id="staffContent" class="tab-content hidden">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-bold">Staff Sessions</h2>
-                            <button onclick="addSession('staff')" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
-                                <i class="fas fa-plus mr-2"></i>Add Session
-                            </button>
-                        </div>
-                        <div id="staffSessions" class="space-y-4"></div>
+                
+                <div id="instructionText" class="text-center p-8 animate-fade-in">
+                    <p class="text-xl mb-4">Click anywhere to advance through the lyrics</p>
+                    <p class="text-gray-400">Current slide is shown in full, next slide is blurred</p>
+                </div>
+                
+                <div id="lyricsDisplay" class="text-center p-8 hidden overflow-hidden">
+                    <!-- Current lyrics (2 lines) -->
+                    <div class="mb-8 lyrics-container slide-in-active">
+                        <div id="currentLyric1" class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 min-h-[3rem] lyrics-line"></div>
+                        <div id="currentLyric2" class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 min-h-[3rem] lyrics-line"></div>
                     </div>
-
-                    <!-- Participants Content -->
-                    <div id="participantsContent" class="tab-content">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-bold">Participant Sessions</h2>
-                            <button onclick="addSession('participants')" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
-                                <i class="fas fa-plus mr-2"></i>Add Session
-                            </button>
-                        </div>
-                        <div id="participantsSessions" class="space-y-4"></div>
+                    
+                    <!-- Next lyrics (2 lines, less blurred) -->
+                    <div class="blur-text lyrics-container slide-in-active">
+                        <div id="nextLyric1" class="text-xl md:text-2xl mb-2 min-h-[2rem] lyrics-line"></div>
+                        <div id="nextLyric2" class="text-xl md:text-2xl mb-2 min-h-[2rem] lyrics-line"></div>
                     </div>
+                </div>
+                
+                <div class="absolute bottom-4 w-full flex justify-between px-6">
+                    <div id="slideInfo" class="text-gray-400"></div>
+                    <div class="text-gray-400">Tap/click to advance</div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
 
-    <!-- Hidden file input -->
-    <input type="file" id="loadFileInput" accept=".json" class="hidden">
-
     <script>
-        // Dark mode detection
+        // Initialize dark mode based on user preference
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.classList.add('dark');
         }
+        
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
             if (event.matches) {
                 document.documentElement.classList.add('dark');
@@ -113,629 +145,256 @@
                 document.documentElement.classList.remove('dark');
             }
         });
-
-        // Global state
-        let agendaData = {
-            organizerName: '',
-            createdDate: '',
-            lastModified: '',
-            staff: {
-                sessions: []
-            },
-            participants: {
-                sessions: []
+        
+        // Get DOM elements
+        const inputView = document.getElementById('inputView');
+        const slideshowView = document.getElementById('slideshowView');
+        const lyricsInput = document.getElementById('lyricsInput');
+        const startButton = document.getElementById('startButton');
+        const clearButton = document.getElementById('clearButton');
+        const exitButton = document.getElementById('exitButton');
+        const slideshowContainer = document.getElementById('slideshowContainer');
+        const instructionText = document.getElementById('instructionText');
+        const lyricsDisplay = document.getElementById('lyricsDisplay');
+        const currentLyric1 = document.getElementById('currentLyric1');
+        const currentLyric2 = document.getElementById('currentLyric2');
+        const nextLyric1 = document.getElementById('nextLyric1');
+        const nextLyric2 = document.getElementById('nextLyric2');
+        const slideInfo = document.getElementById('slideInfo');
+        
+        let lyrics = [];
+        let currentIndex = 0;
+        
+        // Event Listeners
+        startButton.addEventListener('click', startSlideshow);
+        clearButton.addEventListener('click', clearLyrics);
+        exitButton.addEventListener('click', exitSlideshow);
+        slideshowContainer.addEventListener('click', advanceSlide);
+        
+        // Get the previous button and add its event listener
+        const prevButton = document.getElementById('prevButton');
+        prevButton.addEventListener('click', goToPreviousSlide);
+        
+        // Get file handling elements and add event listeners
+        const saveButton = document.getElementById('saveButton');
+        const loadButton = document.getElementById('loadButton');
+        const fileInput = document.getElementById('fileInput');
+        
+        saveButton.addEventListener('click', saveToFile);
+        loadButton.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', loadFromFile);
+        
+        // Try to load saved lyrics from localStorage if available
+        try {
+            const savedLyrics = localStorage.getItem('worshipLyrics');
+            if (savedLyrics) {
+                lyricsInput.value = savedLyrics;
             }
-        };
-        let currentMainTab = 'participants';
-        let staffAccessGranted = false;
-        let sessionCounter = 0;
-        let sectionCounter = 0;
-        let openSessionPanels = new Set(); // Track which session panels are open
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            agendaData.createdDate = new Date().toISOString();
-            renderSessions();
-        });
-
-        // Main tab switching
-        function switchMainTab(tab) {
-            // Check if trying to access staff tab without permission
-            if (tab === 'staff' && !staffAccessGranted) {
-                showPasscodeModal();
+        } catch (e) {
+            console.log('LocalStorage not available:', e);
+        }
+        
+        function startSlideshow() {
+            const text = lyricsInput.value.trim();
+            if (!text) {
+                alert('Please enter some lyrics first.');
                 return;
             }
             
-            currentMainTab = tab;
-            
-            // Update tab buttons
-            document.getElementById('staffTab').className = tab === 'staff' 
-                ? 'px-6 py-3 rounded-lg font-semibold transition-colors tab-active'
-                : 'px-6 py-3 rounded-lg font-semibold transition-colors bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600';
-            
-            document.getElementById('participantsTab').className = tab === 'participants'
-                ? 'px-6 py-3 rounded-lg font-semibold transition-colors tab-active'
-                : 'px-6 py-3 rounded-lg font-semibold transition-colors bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600';
-            
-            // Show/hide content
-            document.getElementById('staffContent').className = tab === 'staff' ? 'tab-content' : 'tab-content hidden';
-            document.getElementById('participantsContent').className = tab === 'participants' ? 'tab-content' : 'tab-content hidden';
-        }
-
-        // Passcode functionality
-        function showPasscodeModal() {
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
-            modal.innerHTML = `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-lock text-3xl text-primary mb-3"></i>
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">Staff Access Required</h3>
-                        <p class="text-gray-600 dark:text-gray-400 text-sm">Please enter the passcode to access the Staff Agenda</p>
-                    </div>
-                    <div class="mb-4">
-                        <input type="password" id="passcodeInput" placeholder="Enter passcode" 
-                               class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent text-center"
-                               onkeypress="if(event.key === 'Enter') checkPasscode()">
-                    </div>
-                    <div class="flex justify-end space-x-3">
-                        <button id="cancelPasscode" class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors">Cancel</button>
-                        <button onclick="checkPasscode()" class="px-4 py-2 bg-primary text-white hover:bg-primary-dark rounded transition-colors">Access</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            
-            // Focus on input field
-            setTimeout(() => {
-                document.getElementById('passcodeInput').focus();
-            }, 100);
-            
-            // Add event listeners
-            modal.querySelector('#cancelPasscode').addEventListener('click', () => {
-                modal.remove();
-            });
-            
-            // Close on backdrop click
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.remove();
-                }
-            });
-        }
-
-        function checkPasscode() {
-            const passcodeInput = document.getElementById('passcodeInput');
-            const enteredPasscode = passcodeInput.value;
-            
-            if (enteredPasscode === 'thenest2025') {
-                staffAccessGranted = true;
-                // Close modal
-                passcodeInput.closest('.fixed').remove();
-                // Switch to staff tab
-                switchMainTab('staff');
-                showCustomAlert('Welcome to Staff Agenda!');
-            } else {
-                // Show error
-                passcodeInput.style.borderColor = '#EF4444';
-                passcodeInput.style.backgroundColor = '#FEF2F2';
-                passcodeInput.value = '';
-                passcodeInput.placeholder = 'Incorrect passcode';
-                
-                // Reset styles after 2 seconds
-                setTimeout(() => {
-                    passcodeInput.style.borderColor = '';
-                    passcodeInput.style.backgroundColor = '';
-                    passcodeInput.placeholder = 'Enter passcode';
-                }, 2000);
-                
-                // Focus back on input
-                passcodeInput.focus();
+            // Try to save lyrics to localStorage
+            try {
+                localStorage.setItem('worshipLyrics', text);
+            } catch (e) {
+                console.log('Could not save to localStorage:', e);
             }
-        }
-
-        // Session management
-        function addSession(type) {
-            sessionCounter++;
-            sectionCounter += 2; // Reserve IDs for default sections
             
-            const session = {
-                id: sessionCounter,
-                title: `New Session ${sessionCounter}`,
-                date: new Date().toISOString().split('T')[0],
-                time: '09:00',
-                urls: [],
-                sections: [
-                    {
-                        id: sectionCounter - 1,
-                        title: 'Grounding',
-                        description: 'Opening prayer, welcome, and setting the spiritual foundation for the session',
-                        duration: 10,
-                        screenshot: null
-                    },
-                    {
-                        id: sectionCounter,
-                        title: 'Debrief',
-                        description: 'Reflection, sharing insights, prayer requests, and closing prayer',
-                        duration: 15,
-                        screenshot: null
+            // Split into lines and remove empty lines and section headers
+            lyrics = text.split('\n')
+                .map(line => line.trim())
+                .filter(line => {
+                    if (line.length === 0) return false;
+                    
+                    // Skip lines that start with verse, chorus, or bridge (case-insensitive)
+                    const lowerLine = line.toLowerCase();
+                    if (lowerLine.startsWith('verse') || 
+                        lowerLine.startsWith('chorus') || 
+                        lowerLine.startsWith('bridge')) {
+                        return false;
                     }
-                ]
-            };
-            
-            agendaData[type].sessions.push(session);
-            renderSessions();
-        }
-
-        function renderSessions() {
-            renderSessionsForType('staff');
-            renderSessionsForType('participants');
-            
-            // Restore open session panels after rendering
-            setTimeout(() => {
-                openSessionPanels.forEach(panelId => {
-                    const details = document.getElementById(panelId);
-                    const toggleBtn = document.getElementById(panelId.replace('sessionDetails_', 'toggleBtn_'));
-                    if (details && toggleBtn) {
-                        details.classList.remove('hidden');
-                        toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i>';
-                    }
+                    
+                    return true;
                 });
-            }, 10);
-        }
-
-        function renderSessionsForType(type) {
-            const container = document.getElementById(`${type}Sessions`);
-            const sessions = agendaData[type].sessions;
-
-            if (sessions.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center text-gray-500 dark:text-gray-400 py-12 bg-white dark:bg-gray-800 rounded-lg">
-                        <i class="fas fa-calendar-plus text-4xl mb-4"></i>
-                        <p class="text-lg">No sessions yet. Click "Add Session" to get started.</p>
-                    </div>
-                `;
+            
+            if (lyrics.length === 0) {
+                alert('Please enter valid lyrics with at least one line.');
                 return;
             }
-
-            container.innerHTML = sessions.map((session, index) => `
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-                    <div class="p-4 border-b border-gray-200 dark:border-gray-700">
-                        <div class="flex justify-between items-start gap-4">
-                            <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div>
-                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">Session Title</label>
-                                    <input type="text" value="${session.title}" onchange="updateSessionField('${type}', ${index}, 'title', this.value)"
-                                           class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent">
-                                </div>
-                                <div>
-                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">Date</label>
-                                    <input type="date" value="${session.date}" onchange="updateSessionField('${type}', ${index}, 'date', this.value)"
-                                           class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent">
-                                </div>
-                                <div>
-                                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">Time</label>
-                                    <input type="time" value="${session.time}" onchange="updateSessionField('${type}', ${index}, 'time', this.value)"
-                                           class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent">
-                                </div>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="toggleSessionDetails('${type}', ${index})" id="toggleBtn_${type}_${index}" class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors">
-                                    <i class="fas fa-chevron-down"></i>
-                                </button>
-                                <button onclick="removeSession('${type}', ${index})" class="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="sessionDetails_${type}_${index}" class="hidden">
-                        <!-- URLs Section -->
-                        <div class="p-4 border-b border-gray-200 dark:border-gray-700">
-                            <div class="flex justify-between items-center mb-3">
-                                <h4 class="font-semibold text-gray-900 dark:text-white">URLs & Resources</h4>
-                                <button onclick="addUrl('${type}', ${index})" class="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600 transition-colors">
-                                    <i class="fas fa-plus mr-1"></i>Add URL
-                                </button>
-                            </div>
-                            <div id="urls_${type}_${index}" class="space-y-2">
-                                ${renderUrls(session.urls, type, index)}
-                            </div>
-                        </div>
-
-                        <!-- Sections and Timeline -->
-                        <div class="p-4">
-                            <div class="flex justify-between items-center mb-4">
-                                <h4 class="font-semibold text-gray-900 dark:text-white">Session Sections & Timeline</h4>
-                                <button onclick="addSection('${type}', ${index})" class="px-3 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors">
-                                    <i class="fas fa-plus mr-2"></i>Add Section
-                                </button>
-                            </div>
-                            
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                                <!-- Sections List -->
-                                <div class="lg:col-span-2">
-                                    <div id="sections_${type}_${index}" class="space-y-4">
-                                        ${renderSections(session.sections, type, index)}
-                                    </div>
-                                </div>
-                                
-                                <!-- Timeline -->
-                                <div class="lg:col-span-1">
-                                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                                        <h5 class="font-semibold mb-3 text-gray-900 dark:text-white">
-                                            <i class="fas fa-clock mr-2"></i>Timeline
-                                        </h5>
-                                        <div id="timeline_${type}_${index}">
-                                            ${renderTimeline(session.sections, session.time)}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderUrls(urls, type, sessionIndex) {
-            if (urls.length === 0) {
-                return '<p class="text-gray-500 dark:text-gray-400 text-sm">No URLs added yet.</p>';
-            }
             
-            return urls.map((url, urlIndex) => `
-                <div class="flex gap-2">
-                    <input type="url" value="${url}" onchange="updateUrl('${type}', ${sessionIndex}, ${urlIndex}, this.value)"
-                           placeholder="https://example.com" 
-                           class="flex-1 px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 focus:ring-2 focus:ring-primary focus:border-transparent">
-                    <button onclick="removeUrl('${type}', ${sessionIndex}, ${urlIndex})" class="px-2 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors">
-                        <i class="fas fa-trash text-sm"></i>
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        function renderSections(sections, type, sessionIndex) {
-            if (sections.length === 0) {
-                return '<p class="text-gray-500 dark:text-gray-400 text-center py-8">No sections added yet.</p>';
-            }
-
-            return sections.map((section, sectionIndex) => `
-                <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">Section Title</label>
-                            <input type="text" value="${section.title || ''}" onchange="updateSectionField('${type}', ${sessionIndex}, ${sectionIndex}, 'title', this.value)"
-                                   placeholder="Section title"
-                                   class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary focus:border-transparent">
-                        </div>
-                        <div>
-                            <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">Duration (minutes)</label>
-                            <input type="number" value="${section.duration || 0}" min="0" onchange="updateSectionField('${type}', ${sessionIndex}, ${sectionIndex}, 'duration', parseInt(this.value) || 0)"
-                                   class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary focus:border-transparent">
-                        </div>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-1">Description</label>
-                        <textarea onchange="updateSectionField('${type}', ${sessionIndex}, ${sectionIndex}, 'description', this.value)"
-                                  placeholder="Section description or notes..."
-                                  class="w-full px-3 py-2 text-base border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary focus:border-transparent resize-vertical h-20">${section.description || ''}</textarea>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 block mb-2">Screenshot</label>
-                        <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center cursor-pointer hover:border-primary transition-colors"
-                             onclick="triggerScreenshotUpload('${type}', ${sessionIndex}, ${sectionIndex})"
-                             ondragover="event.preventDefault(); this.classList.add('drag-over')"
-                             ondragleave="this.classList.remove('drag-over')"
-                             ondrop="handleScreenshotDrop(event, '${type}', ${sessionIndex}, ${sectionIndex})">
-                            ${section.screenshot ? `
-                                <img src="${section.screenshot}" class="max-w-full max-h-32 mx-auto rounded mb-2" alt="Section screenshot">
-                                <button onclick="event.stopPropagation(); removeScreenshot('${type}', ${sessionIndex}, ${sectionIndex})" 
-                                        class="px-2 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600">Remove</button>
-                            ` : `
-                                <i class="fas fa-camera text-2xl text-gray-400 mb-2"></i>
-                                <p class="text-sm text-gray-500">Drop screenshot here or click to upload</p>
-                            `}
-                        </div>
-                        <input type="file" id="screenshotInput_${type}_${sessionIndex}_${sectionIndex}" accept="image/*" class="hidden" onchange="handleScreenshotFile(event, '${type}', ${sessionIndex}, ${sectionIndex})">
-                    </div>
-                    
-                    <div class="flex justify-end">
-                        <button onclick="removeSection('${type}', ${sessionIndex}, ${sectionIndex})" class="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600 transition-colors">
-                            <i class="fas fa-trash mr-1"></i>Remove Section
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderTimeline(sections, startTime) {
-            if (sections.length === 0) {
-                return '<p class="text-gray-500 dark:text-gray-400 text-sm">No sections to display timeline.</p>';
-            }
-
-            let currentTime = new Date(`2000-01-01T${startTime}:00`);
-            let timelineHtml = '';
-            let totalDuration = sections.reduce((sum, section) => sum + (section.duration || 0), 0);
-
-            sections.forEach((section, index) => {
-                const duration = section.duration || 0;
-                const endTime = new Date(currentTime.getTime() + duration * 60000);
-                
-                timelineHtml += `
-                    <div class="flex items-start mb-4 relative">
-                        <div class="flex flex-col items-center mr-3">
-                            <div class="w-3 h-3 bg-primary rounded-full"></div>
-                            ${index < sections.length - 1 ? '<div class="w-0.5 h-12 timeline-line mt-1"></div>' : ''}
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm font-medium text-gray-900 dark:text-white">${section.title || 'Untitled Section'}</div>
-                            <div class="text-xs text-gray-500 dark:text-gray-400">
-                                ${currentTime.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: false})} - 
-                                ${endTime.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: false})}
-                            </div>
-                            <div class="text-xs text-primary font-medium">${duration} min</div>
-                        </div>
-                    </div>
-                `;
-                
-                currentTime = endTime;
-            });
-
-            timelineHtml += `
-                <div class="mt-4 pt-3 border-t border-gray-300 dark:border-gray-600">
-                    <div class="text-sm font-semibold text-gray-900 dark:text-white">
-                        Total Duration: ${totalDuration} minutes
-                    </div>
-                    <div class="text-xs text-gray-500 dark:text-gray-400">
-                        Ends at: ${currentTime.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit', hour12: false})}
-                    </div>
-                </div>
-            `;
-
-            return timelineHtml;
-        }
-
-        // Session functions
-        function updateSessionField(type, sessionIndex, field, value) {
-            agendaData[type].sessions[sessionIndex][field] = value;
-            if (field === 'time') {
-                // Re-render timeline when start time changes
-                const timelineEl = document.getElementById(`timeline_${type}_${sessionIndex}`);
-                if (timelineEl) {
-                    timelineEl.innerHTML = renderTimeline(agendaData[type].sessions[sessionIndex].sections, value);
-                }
-            }
-        }
-
-        function toggleSessionDetails(type, sessionIndex) {
-            const details = document.getElementById(`sessionDetails_${type}_${sessionIndex}`);
-            const toggleBtn = document.getElementById(`toggleBtn_${type}_${sessionIndex}`);
-            const panelId = `sessionDetails_${type}_${sessionIndex}`;
+            // Switch to slideshow view
+            inputView.classList.add('hidden');
+            slideshowView.classList.remove('hidden');
             
-            if (details.classList.contains('hidden')) {
-                details.classList.remove('hidden');
-                toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i>';
-                openSessionPanels.add(panelId);
-            } else {
-                details.classList.add('hidden');
-                toggleBtn.innerHTML = '<i class="fas fa-chevron-down"></i>';
-                openSessionPanels.delete(panelId);
-            }
+            // Reset and start slideshow
+            currentIndex = 0;
+            instructionText.classList.remove('hidden');
+            lyricsDisplay.classList.add('hidden');
         }
-
-        function removeSession(type, sessionIndex) {
-            showConfirmDialog('Are you sure you want to remove this session?', () => {
-                agendaData[type].sessions.splice(sessionIndex, 1);
-                renderSessions();
-            });
-        }
-
-        // URL functions
-        function addUrl(type, sessionIndex) {
-            agendaData[type].sessions[sessionIndex].urls.push('');
-            renderSessions();
-        }
-
-        function updateUrl(type, sessionIndex, urlIndex, value) {
-            agendaData[type].sessions[sessionIndex].urls[urlIndex] = value;
-        }
-
-        function removeUrl(type, sessionIndex, urlIndex) {
-            agendaData[type].sessions[sessionIndex].urls.splice(urlIndex, 1);
-            renderSessions();
-        }
-
-        // Section functions
-        function addSection(type, sessionIndex) {
-            sectionCounter++;
-            const section = {
-                id: sectionCounter,
-                title: '',
-                description: '',
-                duration: 15,
-                screenshot: null
-            };
-            
-            agendaData[type].sessions[sessionIndex].sections.push(section);
-            renderSessions();
-        }
-
-        function updateSectionField(type, sessionIndex, sectionIndex, field, value) {
-            agendaData[type].sessions[sessionIndex].sections[sectionIndex][field] = value;
-            
-            if (field === 'duration' || field === 'title') {
-                // Re-render timeline when duration or title changes
-                const timelineEl = document.getElementById(`timeline_${type}_${sessionIndex}`);
-                if (timelineEl) {
-                    const session = agendaData[type].sessions[sessionIndex];
-                    timelineEl.innerHTML = renderTimeline(session.sections, session.time);
-                }
-            }
-        }
-
-        function removeSection(type, sessionIndex, sectionIndex) {
-            showConfirmDialog('Are you sure you want to remove this section?', () => {
-                agendaData[type].sessions[sessionIndex].sections.splice(sectionIndex, 1);
-                renderSessions();
-            });
-        }
-
-        // Screenshot functions
-        function triggerScreenshotUpload(type, sessionIndex, sectionIndex) {
-            document.getElementById(`screenshotInput_${type}_${sessionIndex}_${sectionIndex}`).click();
-        }
-
-        function handleScreenshotFile(event, type, sessionIndex, sectionIndex) {
-            const file = event.target.files[0];
-            if (!file || !file.type.startsWith('image/')) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                agendaData[type].sessions[sessionIndex].sections[sectionIndex].screenshot = e.target.result;
-                renderSessions();
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function handleScreenshotDrop(event, type, sessionIndex, sectionIndex) {
-            event.preventDefault();
-            event.target.classList.remove('drag-over');
-            
-            const files = Array.from(event.dataTransfer.files);
-            const imageFile = files.find(file => file.type.startsWith('image/'));
-            
-            if (imageFile) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    agendaData[type].sessions[sessionIndex].sections[sectionIndex].screenshot = e.target.result;
-                    renderSessions();
-                };
-                reader.readAsDataURL(imageFile);
-            }
-        }
-
-        function removeScreenshot(type, sessionIndex, sectionIndex) {
-            agendaData[type].sessions[sessionIndex].sections[sectionIndex].screenshot = null;
-            renderSessions();
-        }
-
-        // Save/Load functionality
-        function saveAgenda() {
-            const organizerName = document.getElementById('organizerName').value;
-            if (!organizerName.trim()) {
-                showCustomAlert('Please enter the organizer name before saving');
+        
+        function advanceSlide() {
+            // If first click, hide instructions and show lyrics
+            if (!instructionText.classList.contains('hidden')) {
+                instructionText.classList.add('hidden');
+                lyricsDisplay.classList.remove('hidden');
+                updateLyricDisplay();
                 return;
             }
-
-            agendaData.organizerName = organizerName;
-            agendaData.lastModified = new Date().toISOString();
-
-            const dataStr = JSON.stringify(agendaData, null, 2);
-            const blob = new Blob([dataStr], { type: 'application/json' });
+            
+            // Advance to next slide (by 2 lines for natural flow)
+            currentIndex += 2;
+            
+            // If we've reached the end, go back to start
+            if (currentIndex >= lyrics.length) {
+                currentIndex = 0;
+            }
+            
+            updateLyricDisplay();
+        }
+        
+        function updateLyricDisplay() {
+            // Simple, immediate update - no animations
+            currentLyric1.textContent = lyrics[currentIndex] || '';
+            currentLyric2.textContent = lyrics[currentIndex + 1] || '';
+            nextLyric1.textContent = lyrics[currentIndex + 2] || '';
+            nextLyric2.textContent = lyrics[currentIndex + 3] || '';
+            
+            // Handle wrap-around for preview lines
+            if (currentIndex + 2 >= lyrics.length) {
+                nextLyric1.textContent = lyrics[(currentIndex + 2) % lyrics.length] || '';
+            }
+            if (currentIndex + 3 >= lyrics.length) {
+                nextLyric2.textContent = lyrics[(currentIndex + 3) % lyrics.length] || '';
+            }
+            
+            // Clean, clear styling
+            currentLyric1.style.filter = 'none';
+            currentLyric2.style.filter = 'none';
+            currentLyric1.style.opacity = '1';
+            currentLyric2.style.opacity = '1';
+            
+            nextLyric1.style.filter = 'blur(0.5px)';
+            nextLyric2.style.filter = 'blur(0.5px)';
+            nextLyric1.style.opacity = '0.7';
+            nextLyric2.style.opacity = '0.7';
+            
+            // Update slide information
+            const totalSlides = lyrics.length;
+            const currentSlide = currentIndex + 1;
+            slideInfo.textContent = `Line ${currentSlide} of ${totalSlides}`;
+        }
+        
+        function clearLyrics() {
+            lyricsInput.value = '';
+            try {
+                localStorage.removeItem('worshipLyrics');
+            } catch (e) {
+                console.log('Could not clear localStorage:', e);
+            }
+        }
+        
+        function exitSlideshow() {
+            slideshowView.classList.add('hidden');
+            inputView.classList.remove('hidden');
+        }
+        
+        function goToPreviousSlide(event) {
+            // Stop event propagation to prevent the main click handler from firing
+            event.stopPropagation();
+            
+            // If we're still showing the instruction text, do nothing
+            if (!instructionText.classList.contains('hidden')) {
+                return;
+            }
+            
+            // Go to the previous slide (by 2 lines for natural flow)
+            currentIndex -= 2;
+            
+            // If we're before the first slide, loop to the end
+            if (currentIndex < 0) {
+                // Find the last valid 2-line starting position
+                const totalSlides = Math.ceil(lyrics.length / 2);
+                currentIndex = (totalSlides - 1) * 2;
+            }
+            
+            updateLyricDisplay();
+        }
+        
+        // Function to save the current lyrics to a text file
+        function saveToFile() {
+            const text = lyricsInput.value.trim();
+            if (!text) {
+                alert('Please enter some lyrics first before saving.');
+                return;
+            }
+            
+            // Create an invisible link element
+            const blob = new Blob([text], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             
+            // Create a link to download the file
             const a = document.createElement('a');
             a.href = url;
-            a.download = `nest_agenda_${organizerName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.json`;
+            
+            // Get song title from first non-empty line or use default
+            let firstLine = text.split('\n').find(line => line.trim().length > 0) || '';
+            // Clean up the title: remove section markers and limit length
+            firstLine = firstLine.replace(/^(verse|chorus|bridge)\s*\d*/i, '').trim();
+            const fileName = firstLine.slice(0, 30).trim() || 'worship-lyrics';
+            
+            a.download = `${fileName}.txt`;
             document.body.appendChild(a);
             a.click();
+            
+            // Clean up
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-
-            showCustomAlert('Agenda saved successfully!');
+            
+            // Show success message
+            const originalText = saveButton.textContent;
+            saveButton.textContent = 'Saved!';
+            setTimeout(() => {
+                saveButton.textContent = originalText;
+            }, 1500);
         }
-
-        function loadAgenda() {
-            document.getElementById('loadFileInput').click();
-        }
-
-        document.getElementById('loadFileInput').addEventListener('change', function(event) {
+        
+        // Function to load lyrics from a text file
+        function loadFromFile(event) {
             const file = event.target.files[0];
             if (!file) return;
-
+            
             const reader = new FileReader();
             reader.onload = function(e) {
+                lyricsInput.value = e.target.result;
+                
+                // Save to localStorage
                 try {
-                    const loadedData = JSON.parse(e.target.result);
-                    agendaData = loadedData;
-                    
-                    // Update UI
-                    document.getElementById('organizerName').value = agendaData.organizerName || '';
-                    
-                    // Restore counters
-                    sessionCounter = 0;
-                    sectionCounter = 0;
-                    
-                    ['staff', 'participants'].forEach(type => {
-                        agendaData[type].sessions.forEach(session => {
-                            sessionCounter = Math.max(sessionCounter, session.id || 0);
-                            session.sections.forEach(section => {
-                                sectionCounter = Math.max(sectionCounter, section.id || 0);
-                            });
-                        });
-                    });
-                    
-                    renderSessions();
-                    showCustomAlert('Agenda loaded successfully!');
-                } catch (error) {
-                    showCustomAlert('Error loading file. Please make sure it\'s a valid agenda file.');
+                    localStorage.setItem('worshipLyrics', e.target.result);
+                } catch (err) {
+                    console.log('Could not save to localStorage:', err);
                 }
+                
+                // Show success message
+                const originalText = loadButton.textContent;
+                loadButton.textContent = 'Loaded!';
+                setTimeout(() => {
+                    loadButton.textContent = originalText;
+                }, 1500);
             };
+            
             reader.readAsText(file);
             
-            // Reset the input
-            event.target.value = '';
-        });
-
-        // Custom modal functions
-        function showCustomAlert(message) {
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
-            modal.innerHTML = `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
-                    <p class="text-gray-700 dark:text-gray-300 mb-4">${message}</p>
-                    <div class="flex justify-end">
-                        <button class="px-4 py-2 bg-primary text-white hover:bg-primary-dark rounded transition-colors" onclick="this.closest('.fixed').remove()">OK</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-
-        function showConfirmDialog(message, onConfirm) {
-            const modal = document.createElement('div');
-            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4';
-            modal.innerHTML = `
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg max-w-sm w-full">
-                    <p class="text-gray-700 dark:text-gray-300 mb-4">${message}</p>
-                    <div class="flex justify-end space-x-3">
-                        <button id="cancelBtn" class="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors">Cancel</button>
-                        <button id="confirmBtn" class="px-4 py-2 bg-red-500 text-white hover:bg-red-600 rounded transition-colors">Confirm</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            
-            modal.querySelector('#cancelBtn').addEventListener('click', () => {
-                modal.remove();
-            });
-            
-            modal.querySelector('#confirmBtn').addEventListener('click', () => {
-                modal.remove();
-                onConfirm();
-            });
-            
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.remove();
-                }
-            });
+            // Reset the file input so the same file can be loaded again
+            fileInput.value = '';
         }
     </script>
-
-
-</body></html>
+</body>
+</html>
