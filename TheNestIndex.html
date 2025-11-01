@@ -1,143 +1,588 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Worship Lyrics Slideshow</title>
+    <title>The Nest - Gather Grow Go | WaterMark Church Fellowship</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        primary: '#5D5CDE',
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.5s ease-in-out',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        }
+                        primary: '#1e3a5f',
+                        'nest-navy': '#1e3a5f',
+                        'nest-blue': '#2c3e50',
+                        'sunset-orange': '#FF6B35',
+                        'sunset-pink': '#FF8C94',
+                        'sunset-yellow': '#FFC857',
+                        'sunset-coral': '#F7931E'
                     }
                 }
             }
         }
     </script>
     <style>
-        .blur-text {
-            filter: blur(1px);
-            opacity: 0.8;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:wght@400;500;600;700;800&display=swap');
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
-        
-        .dark .app-container {
-            background-color: #181818;
-            color: white;
+        .font-serif {
+            font-family: 'Playfair Display', serif;
         }
-        
-        .dark .input-container {
-            background-color: #222;
+        .gradient-bg {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2c3e50 40%, #FF6B35 70%, #FFC857 100%);
         }
-        
-        .dark .slideshow-container {
-            background-color: #111;
+        .sunset-gradient {
+            background: linear-gradient(to right, #FF6B35, #F7931E, #FFC857);
         }
-        
-        .transition-all {
-            transition: all 0.3s ease;
+        .card-hover {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        
-        /* Simple, clean transitions */
-        .lyrics-line {
-            transition: opacity 0.3s ease;
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(255, 107, 53, 0.2);
+        }
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .metric-card {
+            background: linear-gradient(145deg, #ffffff 0%, #fff8f3 100%);
+            border: 1px solid #ffe8d6;
+        }
+        .dark .metric-card {
+            background: linear-gradient(145deg, #1f2937 0%, #111827 100%);
+            border: 1px solid #374151;
+        }
+        .verse-text {
+            font-style: italic;
+            font-family: 'Playfair Display', serif;
         }
     </style>
 </head>
-<body class="h-full m-0 font-sans bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-    <div class="app-container h-full flex flex-col">
-        <!-- Input view -->
-        <div id="inputView" class="flex flex-col h-full p-4">
-            <h1 class="text-2xl font-bold text-center mb-4 text-primary dark:text-primary">Worship Lyrics Slideshow</h1>
-            
-            <div class="input-container bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 flex-grow flex flex-col">
-                <label for="lyricsInput" class="block text-sm font-medium mb-2">Paste your lyrics below:</label>
-                <textarea 
-                    id="lyricsInput" 
-                    class="w-full flex-grow p-3 border rounded-md text-base dark:bg-gray-700 dark:border-gray-600 focus:border-primary focus:ring-primary"
-                    placeholder="Enter your lyrics here. Each line will be treated as a separate slide."></textarea>
-                
-                <div class="flex flex-wrap justify-center gap-4 mt-4">
-                    <button 
-                        id="startButton" 
-                        class="bg-primary hover:bg-primary/90 text-white py-2 px-6 rounded-md text-base transition-all"
-                        >Start Slideshow</button>
-                    <button 
-                        id="saveButton" 
-                        class="bg-green-600 hover:bg-green-700 text-white py-2 px-6 rounded-md text-base transition-all"
-                        >Save to File</button>
-                    <button 
-                        id="loadButton" 
-                        class="bg-blue-600 hover:bg-blue-700 text-white py-2 px-6 rounded-md text-base transition-all"
-                        >Load from File</button>
-                    <button 
-                        id="clearButton" 
-                        class="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 py-2 px-6 rounded-md text-base transition-all"
-                        >Clear Lyrics</button>
-                    <input type="file" id="fileInput" accept=".txt" class="hidden" />
+<body class="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+    <!-- Navigation -->
+    <nav class="bg-transparent text-white py-4 absolute top-0 left-0 right-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <img src="https://pfst.cf2.poecdn.net/base/image/f864ae060b53d0be02ebfa5146dcb761384cbd803b688b6a6c3cdc8a9e08fb57?w=1144&h=1366"
+                         alt="The Nest Logo"
+                         class="h-12 w-auto object-contain"
+                         onerror="this.outerHTML='<span class=&quot;text-white text-lg font-bold&quot;>The Nest</span>'">
+                    <h1 class="text-xl font-semibold text-white">The Nest</h1>
+                </div>
+                <div class="hidden md:flex space-x-8 text-sm">
+                    <a href="#about" class="text-white hover:text-sunset-yellow transition-colors">About</a>
+                    <a href="#mission" class="text-white hover:text-sunset-yellow transition-colors">Our Mission</a>
+                    <a href="#activities" class="text-white hover:text-sunset-yellow transition-colors">What We Do</a>
+                    <a href="#connect" class="text-white hover:text-sunset-yellow transition-colors">Get Connected</a>
                 </div>
             </div>
         </div>
-        
-        <!-- Slideshow view -->
-        <div id="slideshowView" class="h-full flex flex-col hidden">
-            <div class="slideshow-container bg-black text-white flex-grow flex flex-col justify-center items-center relative" id="slideshowContainer">
-                <div class="absolute top-4 left-4 flex space-x-2">
-                    <button 
-                        id="exitButton" 
-                        class="bg-gray-800 hover:bg-gray-700 text-white py-1 px-3 rounded-md text-sm"
-                        >Exit</button>
-                    <button 
-                        id="prevButton" 
-                        class="bg-gray-800 hover:bg-gray-700 text-white py-1 px-3 rounded-md text-sm"
-                        title="Go to previous slide"
-                        >&larr; Back</button>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white min-h-screen flex items-center py-20">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <!-- Logo -->
+            <div class="flex items-center justify-center mb-8">
+                <img src="https://pfst.cf2.poecdn.net/base/image/f864ae060b53d0be02ebfa5146dcb761384cbd803b688b6a6c3cdc8a9e08fb57?w=1144&h=1366"
+                     alt="The Nest Logo - Gather Grow Go"
+                     class="h-48 w-auto object-contain drop-shadow-2xl"
+                     onerror="this.outerHTML='<div class=&quot;text-6xl font-bold mb-8&quot;>The Nest</div>'">
+            </div>
+
+            <h2 class="text-3xl md:text-4xl font-light mb-8 opacity-90">Welcome Home</h2>
+
+            <h1 class="text-5xl md:text-7xl font-bold mb-12 leading-tight font-serif">
+                A Place to<br>
+                Gather, Grow & Go
+            </h1>
+
+            <p class="text-xl md:text-2xl font-light mb-12 max-w-4xl mx-auto leading-relaxed opacity-90">
+                Whether this is your first step or your next step with God, we want to help.
+                Join us every Friday at 7 PM for worship, fellowship, and diving deep into God's Word.
+            </p>
+
+            <!-- Call to Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <a href="#connect" class="bg-sunset-orange hover:bg-sunset-coral px-8 py-4 rounded-full text-lg font-semibold transition-all transform hover:scale-105 shadow-lg">
+                    Join Us This Friday
+                </a>
+                <a href="#about" class="bg-white bg-opacity-20 backdrop-blur-sm hover:bg-opacity-30 px-8 py-4 rounded-full text-lg font-semibold transition-all border border-white border-opacity-30">
+                    Learn More
+                </a>
+            </div>
+
+            <!-- Info Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-8 border border-white border-opacity-20">
+                    <i class="fas fa-calendar-alt text-4xl mb-3 text-sunset-yellow"></i>
+                    <div class="text-2xl font-bold mb-2">Every Friday</div>
+                    <div class="text-lg opacity-80">7:00 PM</div>
                 </div>
-                
-                <div id="instructionText" class="text-center p-8 animate-fade-in">
-                    <p class="text-xl mb-4">Click anywhere to advance through the lyrics</p>
-                    <p class="text-gray-400">Current slide is shown in full, next slide is blurred</p>
+                <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-8 border border-white border-opacity-20">
+                    <i class="fas fa-church text-4xl mb-3 text-sunset-yellow"></i>
+                    <div class="text-2xl font-bold mb-2">WaterMark</div>
+                    <div class="text-lg opacity-80">Church</div>
                 </div>
-                
-                <div id="lyricsDisplay" class="text-center p-8 hidden overflow-hidden">
-                    <!-- Current lyrics (2 lines) -->
-                    <div class="mb-8 lyrics-container slide-in-active">
-                        <div id="currentLyric1" class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 min-h-[3rem] lyrics-line"></div>
-                        <div id="currentLyric2" class="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 min-h-[3rem] lyrics-line"></div>
-                    </div>
-                    
-                    <!-- Next lyrics (2 lines, less blurred) -->
-                    <div class="blur-text lyrics-container slide-in-active">
-                        <div id="nextLyric1" class="text-xl md:text-2xl mb-2 min-h-[2rem] lyrics-line"></div>
-                        <div id="nextLyric2" class="text-xl md:text-2xl mb-2 min-h-[2rem] lyrics-line"></div>
-                    </div>
-                </div>
-                
-                <div class="absolute bottom-4 w-full flex justify-between px-6">
-                    <div id="slideInfo" class="text-gray-400"></div>
-                    <div class="text-gray-400">Tap/click to advance</div>
+                <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl p-8 border border-white border-opacity-20">
+                    <i class="fas fa-users text-4xl mb-3 text-sunset-yellow"></i>
+                    <div class="text-2xl font-bold mb-2">All Ages</div>
+                    <div class="text-lg opacity-80">Everyone Welcome</div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-white dark:bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-bold mb-6 font-serif text-nest-navy dark:text-white">Welcome to The Nest</h2>
+                <div class="w-24 h-1 sunset-gradient mx-auto mb-8"></div>
+                <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
+                    We are a group of friends who decided we needed to dive deep into the Word of God and create community.
+                    In a church with thousands of people, we try to make it feel small through fellowship and genuine connection.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+                <div>
+                    <h3 class="text-3xl font-bold mb-6 text-nest-navy dark:text-white">Our Heart</h3>
+                    <p class="text-lg text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+                        We help newcomers connect in a church with thousands by creating an intimate fellowship
+                        where everyone belongs. We don't just help you connect with people—we help you connect
+                        with different ministries inside WaterMark Church and support you with whatever needs you have.
+                    </p>
+                    <p class="text-lg text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
+                        Though most of our members are in their 20s (young adults), The Nest is designed for
+                        <strong>anyone in the community</strong> who wants to connect and create community—men and women,
+                        all ages, all backgrounds.
+                    </p>
+                    <div class="bg-sunset-orange bg-opacity-10 border-l-4 border-sunset-orange p-6 rounded-r-lg">
+                        <p class="verse-text text-lg text-gray-700 dark:text-gray-300">
+                            "And let us consider how we may spur one another on toward love and good deeds,
+                            not giving up meeting together, as some are in the habit of doing, but encouraging
+                            one another—and all the more as you see the Day approaching."
+                        </p>
+                        <p class="text-right text-sm font-semibold mt-2 text-nest-navy dark:text-sunset-orange">— Hebrews 10:24-25</p>
+                    </div>
+                </div>
+
+                <div class="bg-nest-navy rounded-3xl p-8 text-white">
+                    <h3 class="text-3xl font-bold mb-6 font-serif">Making Big Feel Small</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-sunset-orange rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fas fa-heart text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-xl mb-2">Genuine Fellowship</h4>
+                                <p class="text-gray-300">Real relationships built on faith, vulnerability, and authentic community</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-sunset-coral rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fas fa-book-open text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-xl mb-2">Deep Dive Into Scripture</h4>
+                                <p class="text-gray-300">We don't just skim the surface—we explore God's Word together in meaningful ways</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <div class="w-12 h-12 bg-sunset-yellow rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                                <i class="fas fa-hands-helping text-white text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-xl mb-2">Support & Connection</h4>
+                                <p class="text-gray-300">We help you connect with ministries and meet practical needs in your journey</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gather Grow Go Section -->
+    <section id="mission" class="py-20 bg-gray-50 dark:bg-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-bold mb-6 font-serif text-nest-navy dark:text-white">Our Mission</h2>
+                <div class="w-24 h-1 sunset-gradient mx-auto mb-8"></div>
+                <p class="text-2xl text-gray-600 dark:text-gray-400 font-semibold">Gather • Grow • Go</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Gather -->
+                <div class="metric-card p-10 rounded-3xl card-hover text-center">
+                    <div class="w-20 h-20 bg-sunset-orange rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-users text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold mb-4 font-serif text-nest-navy dark:text-white">Gather</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-lg mb-6 leading-relaxed">
+                        We come together every Friday evening at 7 PM to worship, fellowship, and build community.
+                        In a world that pulls us apart, we intentionally gather in Jesus' name.
+                    </p>
+                    <div class="bg-sunset-orange bg-opacity-10 rounded-lg p-4">
+                        <p class="verse-text text-sm text-gray-700 dark:text-gray-300">
+                            "For where two or three gather in my name, there am I with them."
+                        </p>
+                        <p class="text-xs font-semibold mt-1 text-nest-navy dark:text-sunset-orange">— Matthew 18:20</p>
+                    </div>
+                </div>
+
+                <!-- Grow -->
+                <div class="metric-card p-10 rounded-3xl card-hover text-center">
+                    <div class="w-20 h-20 bg-sunset-coral rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-seedling text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold mb-4 font-serif text-nest-navy dark:text-white">Grow</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-lg mb-6 leading-relaxed">
+                        Through teaching, small groups, and authentic conversations, we dive deep into God's Word
+                        and encourage each other to grow in faith, wisdom, and Christlike character.
+                    </p>
+                    <div class="bg-sunset-coral bg-opacity-10 rounded-lg p-4">
+                        <p class="verse-text text-sm text-gray-700 dark:text-gray-300">
+                            "But grow in the grace and knowledge of our Lord and Savior Jesus Christ."
+                        </p>
+                        <p class="text-xs font-semibold mt-1 text-nest-navy dark:text-sunset-orange">— 2 Peter 3:18</p>
+                    </div>
+                </div>
+
+                <!-- Go -->
+                <div class="metric-card p-10 rounded-3xl card-hover text-center">
+                    <div class="w-20 h-20 bg-sunset-yellow rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-hands-praying text-white text-3xl"></i>
+                    </div>
+                    <h3 class="text-3xl font-bold mb-4 font-serif text-nest-navy dark:text-white">Go</h3>
+                    <p class="text-gray-600 dark:text-gray-400 text-lg mb-6 leading-relaxed">
+                        We don't just meet and grow for ourselves. We're equipped and sent out to serve others,
+                        share the Gospel, and make disciples wherever God leads us.
+                    </p>
+                    <div class="bg-sunset-yellow bg-opacity-10 rounded-lg p-4">
+                        <p class="verse-text text-sm text-gray-700 dark:text-gray-300">
+                            "Therefore go and make disciples of all nations..."
+                        </p>
+                        <p class="text-xs font-semibold mt-1 text-nest-navy dark:text-sunset-orange">— Matthew 28:19</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- What We Do Section -->
+    <section id="activities" class="py-20 bg-white dark:bg-gray-900">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-bold mb-6 font-serif text-nest-navy dark:text-white">What We Do</h2>
+                <div class="w-24 h-1 sunset-gradient mx-auto mb-8"></div>
+                <p class="text-xl text-gray-600 dark:text-gray-400">Every Friday night is a blend of worship, learning, and fellowship</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+                <!-- Worship -->
+                <div class="metric-card p-8 rounded-3xl card-hover text-center">
+                    <div class="w-16 h-16 bg-gradient-to-br from-sunset-orange to-sunset-coral rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-music text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4 text-nest-navy dark:text-white">Worship</h3>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        We lift our voices together in songs of praise, creating space to encounter God's presence.
+                    </p>
+                </div>
+
+                <!-- Teaching & Talks -->
+                <div class="metric-card p-8 rounded-3xl card-hover text-center">
+                    <div class="w-16 h-16 bg-gradient-to-br from-sunset-coral to-sunset-yellow rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-bible text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4 text-nest-navy dark:text-white">Teaching & Talks</h3>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        Relevant, biblical teaching that challenges us to grow deeper in our faith and understanding.
+                    </p>
+                </div>
+
+                <!-- Small Groups -->
+                <div class="metric-card p-8 rounded-3xl card-hover text-center">
+                    <div class="w-16 h-16 bg-gradient-to-br from-sunset-yellow to-sunset-orange rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-comments text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4 text-nest-navy dark:text-white">Small Groups</h3>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        Intimate discussions where we can be real, ask questions, and apply Scripture to our lives.
+                    </p>
+                </div>
+
+                <!-- Activities -->
+                <div class="metric-card p-8 rounded-3xl card-hover text-center">
+                    <div class="w-16 h-16 bg-gradient-to-br from-nest-navy to-sunset-orange rounded-2xl flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-gamepad text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-4 text-nest-navy dark:text-white">Activities</h3>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        Fun activities, games, and fellowship events that help us connect and build lasting friendships.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Interactive Learning -->
+            <div class="bg-gradient-to-r from-nest-navy to-sunset-orange rounded-3xl p-12 text-white text-center">
+                <i class="fas fa-lightbulb text-6xl mb-6 text-sunset-yellow"></i>
+                <h3 class="text-3xl font-bold mb-4 font-serif">Interactive Learning</h3>
+                <p class="text-xl mb-6 opacity-90 max-w-3xl mx-auto">
+                    Sometimes we split into groups for activities and discussions, then come back together to share
+                    our lessons learned with the larger community. This creates space for everyone's voice to be heard.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Friday Night Section -->
+    <section class="py-20 bg-nest-navy text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-5xl font-bold mb-6 font-serif">Join Us This Friday</h2>
+                <div class="w-24 h-1 sunset-gradient mx-auto mb-8"></div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
+                <div>
+                    <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-3xl p-10 border border-white border-opacity-20">
+                        <div class="flex items-center mb-6">
+                            <i class="fas fa-clock text-5xl text-sunset-yellow mr-6"></i>
+                            <div>
+                                <h3 class="text-3xl font-bold">7:00 PM</h3>
+                                <p class="text-xl opacity-80">Every Friday Evening</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start mb-6">
+                            <i class="fas fa-map-marker-alt text-5xl text-sunset-orange mr-6 mt-1"></i>
+                            <div>
+                                <h3 class="text-3xl font-bold mb-2">WaterMark Church</h3>
+                                <p class="text-lg opacity-90 mb-1">2083 N Collins Blvd #200</p>
+                                <p class="text-lg opacity-90 mb-3">Richardson, TX 75080</p>
+                                <p class="text-base opacity-80">In the heart of Dallas, TX</p>
+                                <a href="https://maps.app.goo.gl/HEgXNTwiutdTQ1kUA?g_st=ipc"
+                                   target="_blank"
+                                   class="inline-block mt-3 bg-sunset-orange hover:bg-sunset-coral px-5 py-2 rounded-full text-sm font-semibold transition-all">
+                                    <i class="fas fa-directions mr-2"></i>Get Directions
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center">
+                            <i class="fas fa-door-open text-5xl text-sunset-coral mr-6"></i>
+                            <div>
+                                <h3 class="text-3xl font-bold">All Are Welcome</h3>
+                                <p class="text-xl opacity-80">Come as you are</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-4xl font-bold mb-6 font-serif">Why Friday Evenings?</h3>
+                    <p class="text-xl mb-6 opacity-90 leading-relaxed">
+                        As the sun sets and the week comes to a close, we gather to pause, reflect, and refocus on what matters most.
+                        Friday nights at The Nest are a time to leave the busyness behind and rest in God's presence together.
+                    </p>
+                    <p class="text-xl mb-8 opacity-90 leading-relaxed">
+                        There's something special about ending the week in worship and community—it sets the tone for a weekend
+                        centered on rest, relationships, and renewed purpose.
+                    </p>
+                    <div class="bg-sunset-orange bg-opacity-20 border-l-4 border-sunset-yellow p-6 rounded-r-lg">
+                        <p class="verse-text text-xl">
+                            "Come to me, all you who are weary and burdened, and I will give you rest."
+                        </p>
+                        <p class="text-right text-sm font-semibold mt-2">— Matthew 11:28</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Google Maps Section -->
+            <div class="max-w-5xl mx-auto">
+                <div class="text-center mb-8">
+                    <h3 class="text-3xl font-bold mb-3 font-serif">Find Us in Richardson</h3>
+                    <p class="text-xl opacity-90">Located in the heart of Dallas, TX</p>
+                </div>
+                <div class="bg-white bg-opacity-10 backdrop-blur-sm rounded-3xl p-4 border border-white border-opacity-20">
+                    <div class="relative w-full h-96 rounded-2xl overflow-hidden">
+                        <iframe
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3347.5956977729436!2d-96.74563892390174!3d32.96863737358945!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x864c1f3e1e1e1e1e%3A0x1e1e1e1e1e1e1e1e!2s2083%20N%20Collins%20Blvd%20%23200%2C%20Richardson%2C%20TX%2075080!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus"
+                            width="100%"
+                            height="100%"
+                            style="border:0;"
+                            allowfullscreen=""
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            class="rounded-2xl">
+                        </iframe>
+                    </div>
+                    <div class="text-center mt-6 pb-2">
+                        <a href="https://maps.app.goo.gl/HEgXNTwiutdTQ1kUA?g_st=ipc"
+                           target="_blank"
+                           class="inline-block bg-sunset-orange hover:bg-sunset-coral px-8 py-4 rounded-full text-lg font-semibold transition-all transform hover:scale-105 shadow-lg">
+                            <i class="fas fa-map-marked-alt mr-2"></i>Open in Google Maps
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonies / Community Section -->
+    <section class="py-20 bg-gray-50 dark:bg-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-5xl font-bold mb-6 font-serif text-nest-navy dark:text-white">You Belong Here</h2>
+                <div class="w-24 h-1 sunset-gradient mx-auto mb-8"></div>
+                <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+                    Whether you're taking your first step in faith or your next step in discipleship,
+                    The Nest is a place where you'll find authentic community and spiritual growth.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg">
+                    <i class="fas fa-user-plus text-4xl text-sunset-orange mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-4 text-nest-navy dark:text-white">Newcomers</h3>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        New to faith or new to WaterMark? We'll help you connect and find your place in this large church community.
+                    </p>
+                </div>
+
+                <div class="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg">
+                    <i class="fas fa-route text-4xl text-sunset-coral mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-4 text-nest-navy dark:text-white">Seekers</h3>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        Exploring faith and have questions? You're welcome here. We create space for honest conversations and authentic seeking.
+                    </p>
+                </div>
+
+                <div class="bg-white dark:bg-gray-900 rounded-3xl p-8 shadow-lg">
+                    <i class="fas fa-praying-hands text-4xl text-sunset-yellow mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-4 text-nest-navy dark:text-white">Disciples</h3>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        Already following Jesus? Come dive deeper, be challenged, and find community with others pursuing God wholeheartedly.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Get Connected Section -->
+    <section id="connect" class="py-20 bg-white dark:bg-gray-900">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-5xl font-bold mb-6 font-serif text-nest-navy dark:text-white">Take Your Next Step</h2>
+            <div class="w-24 h-1 sunset-gradient mx-auto mb-8"></div>
+
+            <p class="text-2xl text-gray-600 dark:text-gray-400 mb-12 leading-relaxed">
+                We'd love to meet you this Friday! No RSVP needed—just show up and experience community.
+            </p>
+
+            <div class="bg-gradient-to-r from-sunset-orange to-sunset-yellow rounded-3xl p-12 text-white mb-12">
+                <h3 class="text-3xl font-bold mb-4">First Time Visiting?</h3>
+                <p class="text-xl mb-6 opacity-90">
+                    Come a little early (around 6:45 PM) and we'll make sure you feel welcomed and show you around.
+                    We promise you'll leave with new friends and a full heart.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#" class="bg-white text-sunset-orange hover:bg-gray-100 px-8 py-4 rounded-full text-lg font-semibold transition-all transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-envelope mr-2"></i> Contact Us
+                    </a>
+                    <a href="#" class="bg-nest-navy hover:bg-opacity-90 px-8 py-4 rounded-full text-lg font-semibold transition-all transform hover:scale-105 shadow-lg">
+                        <i class="fas fa-question-circle mr-2"></i> Have Questions?
+                    </a>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="metric-card p-8 rounded-3xl">
+                    <i class="fas fa-hands text-4xl text-sunset-orange mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-4 text-nest-navy dark:text-white">Need Prayer?</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">
+                        We believe in the power of prayer. Let us pray with you and for you.
+                    </p>
+                    <a href="#" class="text-sunset-orange hover:text-sunset-coral font-semibold">
+                        Request Prayer →
+                    </a>
+                </div>
+
+                <div class="metric-card p-8 rounded-3xl">
+                    <i class="fas fa-link text-4xl text-sunset-coral mb-4"></i>
+                    <h3 class="text-2xl font-bold mb-4 text-nest-navy dark:text-white">Connect With Ministries</h3>
+                    <p class="text-gray-600 dark:text-gray-400 mb-4">
+                        Want to get involved at WaterMark? We'll help you find the perfect fit.
+                    </p>
+                    <a href="#" class="text-sunset-orange hover:text-sunset-coral font-semibold">
+                        Explore Ministries →
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-nest-navy text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <div class="text-center md:text-left">
+                    <img src="https://pfst.cf2.poecdn.net/base/image/f864ae060b53d0be02ebfa5146dcb761384cbd803b688b6a6c3cdc8a9e08fb57?w=1144&h=1366"
+                         alt="The Nest Logo"
+                         class="h-24 w-auto mx-auto md:mx-0 mb-4"
+                         onerror="this.outerHTML='<div class=&quot;text-2xl font-bold mb-4&quot;>The Nest</div>'">
+                    <p class="text-gray-400 text-lg font-serif">Gather • Grow • Go</p>
+                </div>
+                <div class="text-center">
+                    <h3 class="font-semibold text-xl mb-4">Join Us</h3>
+                    <p class="text-gray-400 mb-2"><i class="fas fa-calendar mr-2"></i> Every Friday at 7:00 PM</p>
+                    <p class="text-gray-400 mb-2"><i class="fas fa-church mr-2"></i> WaterMark Church</p>
+                    <p class="text-gray-400"><i class="fas fa-users mr-2"></i> All Ages Welcome</p>
+                </div>
+                <div class="text-center md:text-right">
+                    <h3 class="font-semibold text-xl mb-4">Connect With Us</h3>
+                    <div class="flex justify-center md:justify-end space-x-4 mb-4">
+                        <a href="#" class="w-10 h-10 bg-sunset-orange rounded-full flex items-center justify-center hover:bg-sunset-coral transition-colors">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-sunset-orange rounded-full flex items-center justify-center hover:bg-sunset-coral transition-colors">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-sunset-orange rounded-full flex items-center justify-center hover:bg-sunset-coral transition-colors">
+                            <i class="fas fa-envelope"></i>
+                        </a>
+                    </div>
+                    <p class="text-gray-400 text-sm">Part of WaterMark Church</p>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 pt-8 text-center text-sm text-gray-400">
+                <p class="verse-text text-lg mb-2">
+                    "As iron sharpens iron, so one person sharpens another."
+                </p>
+                <p class="font-semibold text-sunset-yellow mb-4">— Proverbs 27:17</p>
+                <p>© 2025 The Nest Fellowship • WaterMark Church</p>
+            </div>
+        </div>
+    </footer>
 
     <script>
-        // Initialize dark mode based on user preference
+        // Dark mode detection
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.classList.add('dark');
         }
-        
         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
             if (event.matches) {
                 document.documentElement.classList.add('dark');
@@ -145,256 +590,68 @@
                 document.documentElement.classList.remove('dark');
             }
         });
-        
-        // Get DOM elements
-        const inputView = document.getElementById('inputView');
-        const slideshowView = document.getElementById('slideshowView');
-        const lyricsInput = document.getElementById('lyricsInput');
-        const startButton = document.getElementById('startButton');
-        const clearButton = document.getElementById('clearButton');
-        const exitButton = document.getElementById('exitButton');
-        const slideshowContainer = document.getElementById('slideshowContainer');
-        const instructionText = document.getElementById('instructionText');
-        const lyricsDisplay = document.getElementById('lyricsDisplay');
-        const currentLyric1 = document.getElementById('currentLyric1');
-        const currentLyric2 = document.getElementById('currentLyric2');
-        const nextLyric1 = document.getElementById('nextLyric1');
-        const nextLyric2 = document.getElementById('nextLyric2');
-        const slideInfo = document.getElementById('slideInfo');
-        
-        let lyrics = [];
-        let currentIndex = 0;
-        
-        // Event Listeners
-        startButton.addEventListener('click', startSlideshow);
-        clearButton.addEventListener('click', clearLyrics);
-        exitButton.addEventListener('click', exitSlideshow);
-        slideshowContainer.addEventListener('click', advanceSlide);
-        
-        // Get the previous button and add its event listener
-        const prevButton = document.getElementById('prevButton');
-        prevButton.addEventListener('click', goToPreviousSlide);
-        
-        // Get file handling elements and add event listeners
-        const saveButton = document.getElementById('saveButton');
-        const loadButton = document.getElementById('loadButton');
-        const fileInput = document.getElementById('fileInput');
-        
-        saveButton.addEventListener('click', saveToFile);
-        loadButton.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', loadFromFile);
-        
-        // Try to load saved lyrics from localStorage if available
-        try {
-            const savedLyrics = localStorage.getItem('worshipLyrics');
-            if (savedLyrics) {
-                lyricsInput.value = savedLyrics;
-            }
-        } catch (e) {
-            console.log('LocalStorage not available:', e);
-        }
-        
-        function startSlideshow() {
-            const text = lyricsInput.value.trim();
-            if (!text) {
-                alert('Please enter some lyrics first.');
-                return;
-            }
-            
-            // Try to save lyrics to localStorage
-            try {
-                localStorage.setItem('worshipLyrics', text);
-            } catch (e) {
-                console.log('Could not save to localStorage:', e);
-            }
-            
-            // Split into lines and remove empty lines and section headers
-            lyrics = text.split('\n')
-                .map(line => line.trim())
-                .filter(line => {
-                    if (line.length === 0) return false;
-                    
-                    // Skip lines that start with verse, chorus, or bridge (case-insensitive)
-                    const lowerLine = line.toLowerCase();
-                    if (lowerLine.startsWith('verse') || 
-                        lowerLine.startsWith('chorus') || 
-                        lowerLine.startsWith('bridge')) {
-                        return false;
-                    }
-                    
-                    return true;
-                });
-            
-            if (lyrics.length === 0) {
-                alert('Please enter valid lyrics with at least one line.');
-                return;
-            }
-            
-            // Switch to slideshow view
-            inputView.classList.add('hidden');
-            slideshowView.classList.remove('hidden');
-            
-            // Reset and start slideshow
-            currentIndex = 0;
-            instructionText.classList.remove('hidden');
-            lyricsDisplay.classList.add('hidden');
-        }
-        
-        function advanceSlide() {
-            // If first click, hide instructions and show lyrics
-            if (!instructionText.classList.contains('hidden')) {
-                instructionText.classList.add('hidden');
-                lyricsDisplay.classList.remove('hidden');
-                updateLyricDisplay();
-                return;
-            }
-            
-            // Advance to next slide (by 2 lines for natural flow)
-            currentIndex += 2;
-            
-            // If we've reached the end, go back to start
-            if (currentIndex >= lyrics.length) {
-                currentIndex = 0;
-            }
-            
-            updateLyricDisplay();
-        }
-        
-        function updateLyricDisplay() {
-            // Simple, immediate update - no animations
-            currentLyric1.textContent = lyrics[currentIndex] || '';
-            currentLyric2.textContent = lyrics[currentIndex + 1] || '';
-            nextLyric1.textContent = lyrics[currentIndex + 2] || '';
-            nextLyric2.textContent = lyrics[currentIndex + 3] || '';
-            
-            // Handle wrap-around for preview lines
-            if (currentIndex + 2 >= lyrics.length) {
-                nextLyric1.textContent = lyrics[(currentIndex + 2) % lyrics.length] || '';
-            }
-            if (currentIndex + 3 >= lyrics.length) {
-                nextLyric2.textContent = lyrics[(currentIndex + 3) % lyrics.length] || '';
-            }
-            
-            // Clean, clear styling
-            currentLyric1.style.filter = 'none';
-            currentLyric2.style.filter = 'none';
-            currentLyric1.style.opacity = '1';
-            currentLyric2.style.opacity = '1';
-            
-            nextLyric1.style.filter = 'blur(0.5px)';
-            nextLyric2.style.filter = 'blur(0.5px)';
-            nextLyric1.style.opacity = '0.7';
-            nextLyric2.style.opacity = '0.7';
-            
-            // Update slide information
-            const totalSlides = lyrics.length;
-            const currentSlide = currentIndex + 1;
-            slideInfo.textContent = `Line ${currentSlide} of ${totalSlides}`;
-        }
-        
-        function clearLyrics() {
-            lyricsInput.value = '';
-            try {
-                localStorage.removeItem('worshipLyrics');
-            } catch (e) {
-                console.log('Could not clear localStorage:', e);
-            }
-        }
-        
-        function exitSlideshow() {
-            slideshowView.classList.add('hidden');
-            inputView.classList.remove('hidden');
-        }
-        
-        function goToPreviousSlide(event) {
-            // Stop event propagation to prevent the main click handler from firing
-            event.stopPropagation();
-            
-            // If we're still showing the instruction text, do nothing
-            if (!instructionText.classList.contains('hidden')) {
-                return;
-            }
-            
-            // Go to the previous slide (by 2 lines for natural flow)
-            currentIndex -= 2;
-            
-            // If we're before the first slide, loop to the end
-            if (currentIndex < 0) {
-                // Find the last valid 2-line starting position
-                const totalSlides = Math.ceil(lyrics.length / 2);
-                currentIndex = (totalSlides - 1) * 2;
-            }
-            
-            updateLyricDisplay();
-        }
-        
-        // Function to save the current lyrics to a text file
-        function saveToFile() {
-            const text = lyricsInput.value.trim();
-            if (!text) {
-                alert('Please enter some lyrics first before saving.');
-                return;
-            }
-            
-            // Create an invisible link element
-            const blob = new Blob([text], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            
-            // Create a link to download the file
-            const a = document.createElement('a');
-            a.href = url;
-            
-            // Get song title from first non-empty line or use default
-            let firstLine = text.split('\n').find(line => line.trim().length > 0) || '';
-            // Clean up the title: remove section markers and limit length
-            firstLine = firstLine.replace(/^(verse|chorus|bridge)\s*\d*/i, '').trim();
-            const fileName = firstLine.slice(0, 30).trim() || 'worship-lyrics';
-            
-            a.download = `${fileName}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            
-            // Clean up
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            // Show success message
-            const originalText = saveButton.textContent;
-            saveButton.textContent = 'Saved!';
-            setTimeout(() => {
-                saveButton.textContent = originalText;
-            }, 1500);
-        }
-        
-        // Function to load lyrics from a text file
-        function loadFromFile(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                lyricsInput.value = e.target.result;
-                
-                // Save to localStorage
-                try {
-                    localStorage.setItem('worshipLyrics', e.target.result);
-                } catch (err) {
-                    console.log('Could not save to localStorage:', err);
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
                 }
-                
-                // Show success message
-                const originalText = loadButton.textContent;
-                loadButton.textContent = 'Loaded!';
-                setTimeout(() => {
-                    loadButton.textContent = originalText;
-                }, 1500);
-            };
-            
-            reader.readAsText(file);
-            
-            // Reset the file input so the same file can be loaded again
-            fileInput.value = '';
-        }
+            });
+        });
+
+        // Add scroll effects
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallax = document.querySelectorAll('.gradient-bg');
+
+            parallax.forEach(element => {
+                const speed = scrolled * 0.5;
+                element.style.transform = `translateY(${speed}px)`;
+
+                const fadeStart = 200;
+                const fadeEnd = 600;
+                let opacity = 1;
+
+                if (scrolled >= fadeStart) {
+                    if (scrolled >= fadeEnd) {
+                        opacity = 0;
+                    } else {
+                        opacity = 1 - (scrolled - fadeStart) / (fadeEnd - fadeStart);
+                    }
+                }
+
+                element.style.opacity = opacity;
+            });
+        });
+
+        // Add intersection observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.card-hover').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
     </script>
 </body>
 </html>
+
